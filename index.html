@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>FxScalper</title>
+<meta name="description" content="Personal copy-trading terminal — signals, plain-English trade explanations, and broker connections." />
+<meta name="theme-color" content="#0B1D3A" />
+
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/favicon-32.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="icons/icon-192.png" alt="FxScalper logo" />
+    <div>
+      <h1>Fx<span>Scalper</span></h1>
+      <p>personal execution terminal</p>
+    </div>
+  </div>
+  <div class="conn-pill">
+    <span class="dot" id="connDot"></span>
+    <span id="connCount">0/5 linked</span>
+  </div>
+</header>
+
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker"></div>
+</div>
+
+<main>
+
+  <!-- SIGNALS TAB -->
+  <section class="tab active" id="tab-signals">
+    <div class="row-between">
+      <p class="section-title">⚡ Incoming signals</p>
+      <button class="ghost" id="simulateBtn">+ simulate</button>
+    </div>
+    <div class="notice" id="noBrokerNotice" style="display:none;">
+      No brokers linked — trades will queue but can't be sent. Link one in the Brokers tab.
+    </div>
+    <div id="signalList"></div>
+    <div class="empty" id="emptySignals">
+      No pending signals. Tap "simulate" to preview the flow, or add one manually in the New Signal tab.
+    </div>
+  </section>
+
+  <!-- NEW SIGNAL TAB -->
+  <section class="tab" id="tab-new">
+    <p class="section-title">＋ New signal</p>
+    <form id="newSignalForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Symbol</label>
+          <select id="f-symbol">
+            <option>EURUSD</option>
+            <option>XAUUSD</option>
+            <option>GBPJPY</option>
+            <option>US30</option>
+            <option>BTCUSD</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Direction</label>
+          <select id="f-direction">
+            <option>BUY</option>
+            <option>SELL</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Entry</label><input type="number" step="any" id="f-entry" required /></div>
+        <div class="form-group"><label>Stop Loss</label><input type="number" step="any" id="f-sl" required /></div>
+        <div class="form-group"><label>Take Profit</label><input type="number" step="any" id="f-tp" required /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>RSI</label><input type="number" min="0" max="100" id="f-rsi" value="50" /></div>
+        <div class="form-group">
+          <label>Trend</label>
+          <select id="f-trend">
+            <option value="up">Uptrend</option>
+            <option value="down">Downtrend</option>
+            <option value="range">Ranging</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Source</label>
+        <input type="text" id="f-source" placeholder="e.g. Telegram: FX Alpha Calls" value="Manual Entry" />
+      </div>
+      <button type="submit" class="submit-btn">Add signal</button>
+    </form>
+  </section>
+
+  <!-- BROKERS TAB -->
+  <section class="tab" id="tab-brokers">
+    <p class="section-title">Connections</p>
+    <div id="brokerList"></div>
+    <p class="hint">MT4/MT5 connect through your VPS-hosted terminal bridge (EA endpoint). TradingView provides chart data and webhook alerts only — no execution.</p>
+  </section>
+
+  <!-- HISTORY TAB -->
+  <section class="tab" id="tab-history">
+    <p class="section-title">📜 Trade log</p>
+    <div id="historyList"></div>
+    <div class="empty" id="emptyHistory">Resolved signals will appear here.</div>
+  </section>
+
+  <!-- SETTINGS TAB -->
+  <section class="tab" id="tab-settings">
+    <p class="section-title">Preferences</p>
+    <div class="settings-list">
+      <div class="settings-row"><span>Signal source</span><span class="settings-val">Telegram · TradingView · Manual</span></div>
+      <div class="settings-row"><span>Explanation engine</span><span class="settings-val">Rule-based</span></div>
+      <div class="settings-row"><span>Auto-execute</span><span class="settings-val">Off — confirmation required</span></div>
+      <div class="settings-row"><span>Risk cap</span><span class="settings-val">Max 2% per trade</span></div>
+    </div>
+    <p class="hint">FxScalper runs entirely in your browser — signals and history are stored locally on this device. Wiring real broker execution requires a backend bridge (see README).</p>
+  </section>
+
+</main>
+
+<nav>
+  <button class="active" data-tab="signals">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a8 8 0 0 1 8-8"/><path d="M4 11a8 8 0 0 0 8 8"/><circle cx="12" cy="11" r="2"/></svg>
+    Signals
+  </button>
+  <button data-tab="new">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    New
+  </button>
+  <button data-tab="brokers">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 1 1 0 10h-2M8 12h8"/></svg>
+    Brokers
+  </button>
+  <button data-tab="history">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+    History
+  </button>
+  <button data-tab="settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<script src="js/app.js"></script>
+</body>
+</html>
